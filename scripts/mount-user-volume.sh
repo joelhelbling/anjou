@@ -1,9 +1,22 @@
 #!/bin/sh
 
-DEVICE=$1
-USER=$2
+# must be run as super user
 
-# as super user
-mke2fs -F -j /dev/$1
-mkdir /home/$2
-mount /dev/$1 /home/$2
+if [ "$1" == "" ]; then
+
+  echo "Usage: mount-user-volume.sh emmajean /dev/sda2"
+
+else
+
+  USER=$1
+  # e.g. /dev/sda2
+  DEVICE=$( echo $2 | sed -r 's/sda/xvda/' )
+
+  # this should only happen for new drives!
+  mk2fs.ext4 $DEVICE
+
+  mkdir /home/$USER
+  mount $DEVICE /home/$USER
+
+fi
+
