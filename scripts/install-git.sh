@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo apt-get install git-core
+apt-get -q -y install git-core
