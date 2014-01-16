@@ -12,6 +12,7 @@ module Anjou
     DEFAULT_ZONE          = "us-east-1d"
     DEFAULT_AMI           = 'ami-ad184ac4' # Ubuntu Server 13.10 64bit
     DEFAULT_INSTANCE_TYPE = 't1.micro'
+    DEFAULT_USER_DATA     = "#!/bin/sh\n\necho "Welcome to Anjou!\n\n\" >> /etc/motd\n"
 
     def initialize(access_key_id=KEY_ID, secret_access_key=SECRET_KEY)
       @api = ::AWS::EC2.new(
@@ -24,7 +25,8 @@ module Anjou
       ami: DEFAULT_AMI,
       key_name: KEY_PAIR_NAME,
       zone: DEFAULT_ZONE,
-      instance_type: DEFAULT_INSTANCE_TYPE
+      instance_type: DEFAULT_INSTANCE_TYPE,
+      user_data: DEFAULT_USER_DATA
     )
       key_pair = key_pair_for key_name
       raise "Unable to start instance: no such key pair exists! (key_name: #{key_name})" unless key_pair && key_pair.exists?
@@ -32,7 +34,8 @@ module Anjou
         image_id: ami,
         key_pair: key_pair,
         availability_zone: zone,
-        instance_type: instance_type
+        instance_type: instance_type,
+        user_data: user_data
       ).tap do |instance|
         if username
           instance.tags.Name = name_tag_for username
