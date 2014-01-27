@@ -13,6 +13,7 @@ module Anjou
     DEFAULT_AMI           = 'ami-ad184ac4' # Ubuntu Server 13.10 64bit
     DEFAULT_INSTANCE_TYPE = 't1.micro'
     DEFAULT_USER_DATA     = "#!/bin/sh\n\necho \"Welcome to Anjou!\n\n\" >> /etc/motd\n"
+    DEFAULT_SNAPSHOT_NAME = 'anjou-generic'
 
     def initialize(access_key_id=KEY_ID, secret_access_key=SECRET_KEY)
       @api = ::AWS::EC2.new(
@@ -48,10 +49,16 @@ module Anjou
       @api.key_pairs.select{ |kp| kp.name == key_name }.last
     end
 
-    def create_user_volume(username: nil, user_vol_size: USER_VOL_SIZE, zone: DEFAULT_ZONE)
+    def create_user_volume(username: nil, user_vol_size: USER_VOL_SIZE, zone: DEFAULT_ZONE, snapshot: DEFAULT_SNAPSHOT_NAME)
+
+      aws_snapshot = @api.snapshots.tagged('Name').select do |snp|
+        snp.tags.to_a.include? ['Name', snapshot]
+      end.last
+
       @api.volumes.create(
         size: user_vol_size,
-        availability_zone: zone
+        availability_zone: zone,
+        snapshot: aws_snapshot
       ).tap do |volume|
         if username
           volume.tags.Name = name_tag_for username
