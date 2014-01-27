@@ -45,6 +45,16 @@ module Anjou
       end
     end
 
+    def instance_for(username)
+      @api.instances.tagged('owner').select do |instance|
+        instance.tags.to_a.include? ['owner', username]
+      end.select{|i| i.status != :terminated }.last
+    end
+
+    def instance_status_for(username)
+      instance_for(username).status
+    end
+
     def key_pair_for(key_name)
       @api.key_pairs.select{ |kp| kp.name == key_name }.last
     end
@@ -75,6 +85,21 @@ module Anjou
       @api.volumes.tagged('owner').select do |vol|
         vol.tags.to_a.include? ['owner', username]
       end.first
+    end
+
+    def user_volume_status_for(username)
+      user_volume_for(username).status
+    end
+
+    #@depricated: this method violates Anjou::EC2's "thin wrapper" contract.
+    # It's a useful method, but it should be implemented elsewhere.
+    def wait_for_user_volume(username, status: :available, timeout: 15)
+      seconds = 0
+      while user_volume_status_for(username) != status
+        raise "Timeout: After #{timeout} seconds, user volume for #{username} is still not #{status}" if seconds >= timeout
+        seconds += sleep 1
+      end
+      status
     end
 
     def attach(username, instance, device=nil)
