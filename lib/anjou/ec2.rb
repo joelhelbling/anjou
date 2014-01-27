@@ -12,7 +12,7 @@ module Anjou
     DEFAULT_ZONE          = "us-east-1d"
     DEFAULT_AMI           = 'ami-ad184ac4' # Ubuntu Server 13.10 64bit
     DEFAULT_INSTANCE_TYPE = 't1.micro'
-    DEFAULT_USER_DATA     = "#!/bin/sh\n\necho "Welcome to Anjou!\n\n\" >> /etc/motd\n"
+    DEFAULT_USER_DATA     = "#!/bin/sh\n\necho \"Welcome to Anjou!\n\n\" >> /etc/motd\n"
 
     def initialize(access_key_id=KEY_ID, secret_access_key=SECRET_KEY)
       @api = ::AWS::EC2.new(
