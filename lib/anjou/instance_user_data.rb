@@ -22,5 +22,9 @@ module Anjou
       install_script.to_s
     end
 
+    def to_s
+      render_mime
+    end
+
   end
 end
