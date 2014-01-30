@@ -1,16 +1,11 @@
-require 'mime'
-
 module Anjou
   class InstanceUserData
-    include MIME
 
     def initialize(scripts=[])
       @scripts = scripts
     end
 
     def render_mime
-      install_script = MIME::MultipartMedia::Mixed.new
-
       mime_sections = [ message_header ]
       @scripts.each do |script|
         filename  = "#{script}.sh"
