@@ -1,3 +1,3 @@
 #!/bin/sh
 
-useradd 
+useradd --disabled-password --gecos "$1" $1
