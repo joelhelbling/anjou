@@ -1,6 +1,4 @@
-require "anjou/authorized_keys"
-require "anjou/ec2"
-require "anjou/instance_user_data"
+require 'anjou'
 
 module Anjou
   class LaunchInstance
@@ -24,7 +22,16 @@ module Anjou
 
         create_instance_for(host_user, user_data).tap do |instance|
           attach users, instance
+
+          users.each do |user|
+            home = Anjou::UserHome.new user, instance.dns_name
+            puts "Creating login for #{user}..."
+            home.create_linux_user
+            puts "Mounting home directory for #{user}..."
+            home.mount_home_dir
+          end
         end
+
       end
 
       private
