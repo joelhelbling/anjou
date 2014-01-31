@@ -14,11 +14,7 @@ module Anjou
 
         ensure_volumes_for users
 
-        user_data = Anjou::InstanceUserData.new([
-          'update-ubuntu',
-          'install-git',
-          'install-ruby'
-        ]).render_mime
+        user_data = Anjou::InstanceUserData.render_mime 'install-ruby'
 
         create_instance_for(host_user, user_data).tap do |instance|
           attach users, instance

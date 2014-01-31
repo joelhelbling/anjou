@@ -1,18 +1,20 @@
 module Anjou
   class InstanceUserData
+    PREPENDS  = 'scripts/first-boot/prepend'
+    OPTIONALS = 'scripts/first-boot/optional'
+    APPENDS   = 'scripts/first-boot/append'
+
+    def self.render_mime(*scripts)
+      self.new(scripts.flatten).render_mime
+    end
 
     def initialize(scripts=[])
       @scripts = scripts
+      @script_sequence = 0
     end
 
     def render_mime
-      mime_sections = [ message_header ]
-      @scripts.each do |script|
-        filename  = "#{script}.sh"
-        filepath  = "scripts/first-boot/#{filename}"
-        mime_sections << file_part(filename, File.read(filepath))
-      end
-
+      generate_mime
       mime_sections.join("\n")
     end
 
@@ -22,8 +24,26 @@ module Anjou
 
     private
 
+    def generate_mime
+      add_to PREPENDS,  [ 'update-ubuntu', 'install-git' ]
+      add_to OPTIONALS, @scripts
+      add_to APPENDS,   [ 'update-motd' ]
+    end
+
+    def add_to(path, scripts)
+      scripts.each do |script|
+        filename  = "#{script}.sh"
+        filepath  = "#{path}/#{filename}"
+        mime_sections << file_part(filename, File.read(filepath))
+      end
+    end
+
     def boundary
       @boundary ||= "~~Anjou::UserData~~"
+    end
+
+    def mime_sections
+      @mime_sections ||= [ message_header ]
     end
 
     def message_header
@@ -38,12 +58,16 @@ MIME-Version: 1.0
       [ part_header(filename), file_contents ].join
     end
 
+    def file_sequence
+      "%03d" % ( @script_sequence += 1 )
+    end
+
     def part_header(filename, content_type: 'text/x-shellscript')
       <<-PART
 --#{boundary}
 Content-Type: #{content_type}
 MIME-Version: 1.0
-Content-Disposition: attachment; filename="#{filename}"
+Content-Disposition: attachment; filename="#{file_sequence}-#{filename}"
 
       PART
     end
