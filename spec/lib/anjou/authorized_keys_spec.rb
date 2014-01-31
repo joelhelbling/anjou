@@ -25,5 +25,21 @@ module Anjou
 
     its(:keys)     { should have(3).items }
     its(:contents) { should == expected_authorized_keys }
+
+    context 'when user is not on GitHub' do
+      subject { described_class }
+      let(:gh_response) do
+        <<-RESPONSE
+{
+  "message": "Not Found",
+  "documentation_url": "http://developer.github.com/v3"
+}
+        RESPONSE
+      end
+
+      it 'throws an error' do
+        expect { described_class.new gh_user }.to raise_error /Not Found/
+      end
+    end
   end
 end

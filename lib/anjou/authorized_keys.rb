@@ -12,6 +12,7 @@ module Anjou
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       data = http.get(uri.request_uri)
       @keys = JSON.parse data.body
+      raise "Response from GitHub: #{@keys['message']}" if @keys.kind_of? Hash
     end
 
     def contents
