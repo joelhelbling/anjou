@@ -14,6 +14,7 @@ module Anjou
     DEFAULT_INSTANCE_TYPE = 't1.micro'
     DEFAULT_USER_DATA     = "#!/bin/sh\n\necho \"Welcome to Anjou!\n\n\" >> /etc/motd\n"
     DEFAULT_SNAPSHOT_NAME = 'anjou-generic'
+    SECURITY_GROUP_NAME   = 'Anjou'
 
     def initialize(access_key_id=KEY_ID, secret_access_key=SECRET_KEY)
       @api = ::AWS::EC2.new(
@@ -36,7 +37,8 @@ module Anjou
         key_pair: key_pair,
         availability_zone: zone,
         instance_type: instance_type,
-        user_data: user_data
+        user_data: user_data,
+        security_groups: security_groups
       ).tap do |instance|
         if username
           instance.tags.Name = name_tag_for username
@@ -120,6 +122,10 @@ module Anjou
 
     def next_device_for(instance)
       '/dev/sda' + (instance.attachments.keys.size + 1).to_s
+    end
+
+    def security_groups
+      @api.security_groups.to_a.select{ |sg| sg.name == 'Anjou' }
     end
 
     private

@@ -14,7 +14,7 @@ module Anjou
 
         ensure_volumes_for users
 
-        user_data = Anjou::InstanceUserData.render_mime 'install-ruby'
+        user_data = Anjou::InstanceUserData.render_mime 'install-ruby', 'install-mosh'
 
         create_instance_for(host_user, user_data).tap do |instance|
           attach users, instance
