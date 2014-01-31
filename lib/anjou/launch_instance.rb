@@ -14,6 +14,8 @@ module Anjou
 
         ensure_volumes_for users
 
+        ensure_authorized_keys_for users
+
         user_data = Anjou::InstanceUserData.render_mime 'install-ruby', 'install-mosh'
 
         create_instance_for(host_user, user_data).tap do |instance|
@@ -25,6 +27,8 @@ module Anjou
             home.create_linux_user
             puts "Mounting home directory for #{user}..."
             home.mount_home_dir
+            puts "Installing authorized_keys for #{user}..."
+            home.install_authorized_keys @authorized_keys[user]
           end
         end
 
@@ -59,6 +63,13 @@ module Anjou
             puts "Creating user volume for #{user}"
             ec2.create_user_volume(username: user)
           end
+        end
+      end
+
+      def ensure_authorized_keys_for users
+        @authorized_keys = {}
+        users.each do |user|
+          @authorized_keys[user] = Anjou::AuthorizedKeys.new(user)
         end
       end
 

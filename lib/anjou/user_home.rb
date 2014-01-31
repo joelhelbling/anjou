@@ -1,3 +1,5 @@
+require 'net/sftp'
+
 module Anjou
   class UserHome
     ANJOU_LOGIN = 'ubuntu'
@@ -21,6 +23,19 @@ module Anjou
       volume = api.user_volume_for @username
       device = volume.attachments.to_a.first.device.gsub(/sda/, "xvda")
       ssh_do "sudo mount #{device} /home/#{@username}"
+    end
+
+    def install_authorized_keys(authorized_keys=Anjou::AuthorizedKeys.new(@username))
+      Net::SSH.start(@hostname, ANJOU_LOGIN) do |ssh|
+        ssh.sftp.connect do |sftp|
+          sftp.file.open("#{@username}-authorized_keys", 'w') do |fh|
+            fh.write authorized_keys.contents
+          end
+        end
+      end
+      ssh_do "sudo mv ~#{ANJOU_LOGIN}/#@username-authorized_keys ~#@username/.ssh/authorized_keys"
+      ssh_do "sudo chmod 0600 ~#@username/.ssh/authorized_keys"
+      ssh_do "sudo chown -R #@username:#@username /home/#@username"
     end
 
     private
