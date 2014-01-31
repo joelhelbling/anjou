@@ -1,7 +1,8 @@
 module Anjou
   class UserHome
     ANJOU_LOGIN = 'ubuntu'
-    SSH_READY_TIMEOUT = 30
+    SSH_READY_TIMEOUT = 300
+    SSH_READY_SLEEP_INCREMENT = 2
 
     def initialize(username, hostname)
       @username = username
@@ -10,7 +11,6 @@ module Anjou
 
     def create_linux_user
       ssh_do "sudo adduser --disabled-password --gecos '#{@username}' #{@username}"
-      # ssh_do "sudo adduser #{@username} sudo"
       ssh_do "echo '#{@username} ALL=(ALL) NOPASSWD:ALL' > /tmp/sudoize-#{@username}"
       ssh_do "sudo chown root:root /tmp/sudoize-#{@username}"
       ssh_do "sudo chmod 440 /tmp/sudoize-#{@username}"
@@ -36,12 +36,16 @@ module Anjou
 
     def ensure_ssh_ready
       timeout = 0
-      until ! `#{ssh_cmd} ls 2>&1`.match(/Connection refused/) do
-        raise "ssh connection refused! (retried #{timeout} times)" if timeout >= SSH_READY_TIMEOUT
-        puts " - connection refused, waiting a second..."
-        sleep 1
+      until ssh_ready? do
+        raise "SSH connection not ready after #{timeout} attempts." if timeout >= (SSH_READY_TIMEOUT / SSH_READY_SLEEP_INCREMENT)
+        puts " ...connection not ready, waiting a bit..."
+        sleep SSH_READY_SLEEP_INCREMENT
         timeout += 1
       end
+    end
+
+    def ssh_ready?
+      @ssh_ready ||= `#{ssh_cmd} ls /var/lib/cloud/instance/* 2>&1`.include? 'boot-finished'
     end
 
     def ssh_cmd
