@@ -13,7 +13,7 @@ module Anjou
     DEFAULT_AMI           = 'ami-ad184ac4' # Ubuntu Server 13.10 64bit
     DEFAULT_INSTANCE_TYPE = 't1.micro'
     DEFAULT_USER_DATA     = "#!/bin/sh\n\necho \"Welcome to Anjou!\n\n\" >> /etc/motd\n"
-    DEFAULT_SNAPSHOT_NAME = 'anjou-generic'
+    DEFAULT_SNAPSHOT_NAME = 'anjou-generic' # snap-14f16403
     SECURITY_GROUP_NAME   = 'Anjou'
 
     def initialize(access_key_id=KEY_ID, secret_access_key=SECRET_KEY)

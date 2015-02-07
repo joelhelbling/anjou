@@ -1,0 +1,44 @@
+---
+# Anjou requires credentials in order to interact with AWS.  You can read about
+# how to setup API credentials here:
+#
+# http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html
+#
+# PLEASE BE AWARE THAT USE OF THIS SOFTWARE MAY CAUSE USAGE OF
+# BILLABLE AMAZON WEB SERVICES.  I REPEAT: USING ANJOU RESULTS
+# IN YOUR AWS ACCOUNT BEING BILLED BY AMAZON.
+#
+aws_access_key_id:     REPLACE_ME_IN_ORDER_TO_SPEND_MONEY
+aws_secret_access_key: REPLACE_ME_IN_ORDER_TO_SPEND_MONEY
+
+# AWS requires a key pair to setup a default login.  This key pair will be used for logging into
+# the new instance as the default user (username "ubuntu")
+key_pair_name: REPLACE_ME
+
+# New user home directories are added within a dedicated attached EBS volume.  You can adjust the
+# size, but consider that you will be billed accordingly (see S3/EBS pricing).
+user_volume_size: 1Gb
+
+ec2_zone: us-east-1d
+
+# Default is ami-ad184ac4 (Ubuntu Server 13.10 64bit)
+ec2_ami: ami-ad184ac4
+
+# Currently t1.micro is the only instance type supported.  Other instance types
+# require a VPC, and Anjou does not yet support creating an instance in a VPC.
+ec2_instance_type: t1.micro
+
+# This is the snapshot from which a new user's home directory EBS volume will be
+# created.  The default snapshot is snap-14f16403, a public snapshot provided by
+# the creator of Anjou.
+ec2_snapshot: snap-14f16403
+
+# A security group is required so that specific ports will be accessible on the new
+# instance (e.g. ssh, http, etc).  This value can be either an id or a name.  If the
+# specified security group does not exist, it will be automatically created with a
+# few basic ports opened.
+ec2_security_group: Anjou
+
+# A VPC subnet is required for any other instance type than t1.micro
+# Coincidentally, t1.micro is the only instance type supported at the moment.
+#vpc_subnet: Anjou
