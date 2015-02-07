@@ -1,6 +1,6 @@
 # Anjou
 
-TODO: Write a gem description
+Anjou brings you, your stuff, some other programmer and their stuff all together on a pair programming machine.
 
 ## Installation
 
@@ -18,7 +18,8 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+This thing is still kinda rough, and it lacks a command-line interface (which is a pretty big
+deal, considering).  Stay tuned, though.
 
 ## Contributing
 
