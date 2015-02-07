@@ -7,9 +7,12 @@ module Anjou
     describe "#render_mime", :fakefs do
       before do
         make_scripts_dir
+        make_install_script 'ubuntu-updates', :prepend
+        make_install_script 'git', :prepend
         make_install_script 'foo'
         make_install_script 'bar'
         make_install_script 'baz'
+        make_install_script 'motd', :append
       end
 
       context "for a subset of existing scripts" do

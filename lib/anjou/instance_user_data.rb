@@ -25,9 +25,9 @@ module Anjou
     private
 
     def generate_mime
-      add_to PREPENDS,  [ 'update-ubuntu', 'install-git' ]
+      add_to PREPENDS,  [ 'install-ubuntu-updates', 'install-git' ]
       add_to OPTIONALS, @scripts
-      add_to APPENDS,   [ 'update-motd' ]
+      add_to APPENDS,   [ 'install-motd' ]
     end
 
     def add_to(path, scripts)
